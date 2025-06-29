@@ -282,14 +282,29 @@ class PoCGuide {
         // 먼저 로컬 스토리지에서 임시 저장된 내용 확인
         const tempContent = localStorage.getItem(`temp_${filename}`);
         if (tempContent) {
+            console.log(`로컬 스토리지에서 로드: ${filename}`);
             return tempContent;
         }
         
-        const response = await fetch(`content/guides/${filename}`);
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        // 파일 경로 구성 - config.json의 file 필드는 guides 폴더 기준 상대 경로
+        const filePath = `content/guides/${filename}`;
+        console.log(`파일 로드 시도: ${filePath}`);
+        
+        try {
+            const response = await fetch(filePath);
+            console.log(`응답 상태: ${response.status} ${response.statusText}`);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText} - ${filePath}`);
+            }
+            
+            const content = await response.text();
+            console.log(`파일 로드 성공: ${filename} (${content.length} 문자)`);
+            return content;
+        } catch (error) {
+            console.error(`파일 로드 실패: ${filePath}`, error);
+            throw error;
         }
-        return await response.text();
     }
 
     renderContent(markdown) {
