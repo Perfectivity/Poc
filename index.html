@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tencent Cloud PoC 가이드</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/markdown.css">
+    <link rel="stylesheet" href="css/editor.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
+    <link rel="icon" type="image/png" href="https://cloud.tencent.com/favicon.ico">
+</head>
+<body>
+    <div class="container">
+        <!-- 헤더 -->
+        <header class="header">
+            <div class="logo">
+                <img src="https://cloud.tencent.com/favicon.ico" alt="Tencent Cloud" style="height: 28px; width: 28px;">
+                <span>Tencent Cloud MPaaS 제품 사용 가이드</span>
+            </div>
+            <div class="header-controls">
+                <button id="editModeToggle" class="edit-toggle" title="편집 모드">✏️</button>
+                <button id="darkModeToggle" class="theme-toggle" title="다크 모드">🌙</button>
+                <button id="searchToggle" class="search-toggle" title="검색">🔍</button>
+            </div>
+        </header>
+
+        <!-- 검색 패널 -->
+        <div id="searchPanel" class="search-panel hidden">
+            <input type="text" id="searchInput" placeholder="검색어를 입력하세요...">
+            <div id="searchResults" class="search-results"></div>
+        </div>
+
+        <div class="main-content">
+            <!-- 사이드 메뉴 -->
+            <nav class="sidebar">
+                <div id="menuTree" class="menu-tree">
+                    <!-- 메뉴가 JavaScript로 동적 생성됩니다 -->
+                </div>
+            </nav>
+
+            <!-- 콘텐츠 영역 -->
+            <main class="content">
+                <!-- 뷰어 모드 -->
+                <div id="viewerMode" class="viewer-mode">
+                    <div id="content" class="markdown-content">
+                        <!-- 마크다운 콘텐츠가 여기에 렌더링됩니다 -->
+                    </div>
+                </div>
+
+                <!-- 에디터 모드 -->
+                <div id="editorMode" class="editor-mode hidden">
+                    <div class="editor-header">
+                        <div class="editor-controls">
+                            <button id="saveContent" class="btn btn-primary">저장</button>
+                            <button id="cancelEdit" class="btn btn-secondary">취소</button>
+                            <button id="insertImage" class="btn btn-secondary">이미지 삽입</button>
+                        </div>
+                        <div class="editor-info">
+                            <span id="currentFileName"></span>
+                        </div>
+                    </div>
+                    <div class="editor-container">
+                        <div id="monacoEditor" class="monaco-editor"></div>
+                    </div>
+                    <div class="editor-preview">
+                        <div class="preview-header">
+                            <h3>미리보기</h3>
+                        </div>
+                        <div id="previewContent" class="preview-content"></div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- 목차 -->
+            <aside class="toc">
+                <div class="toc-header">
+                    <h3>목차</h3>
+                </div>
+                <div id="tocContent" class="toc-content">
+                    <!-- 목차가 JavaScript로 동적 생성됩니다 -->
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <!-- 이미지 업로드 모달 -->
+    <div id="imageModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>이미지 삽입</h3>
+                <button id="closeImageModal" class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="image-upload-area" id="imageUploadArea">
+                    <p>이미지를 여기에 드래그하거나 클릭하여 선택하세요</p>
+                    <input type="file" id="imageFileInput" accept="image/*" multiple>
+                </div>
+                <div class="image-paste-area">
+                    <p>또는 클립보드에서 이미지를 붙여넣으세요 (Ctrl+V)</p>
+                    <div id="pasteArea" class="paste-area" contenteditable="true">
+                        이미지를 여기에 붙여넣으세요...
+                    </div>
+                </div>
+                <div id="imagePreview" class="image-preview"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/markdown.js"></script>
+    <script src="js/toc.js"></script>
+    <script src="js/editor.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html> 
