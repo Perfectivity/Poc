@@ -3,6 +3,7 @@ class PoCGuide {
     constructor() {
         this.currentContent = null;
         this.menuData = null;
+        this.currentFile = null;
         this.init();
     }
 
@@ -11,7 +12,7 @@ class PoCGuide {
         this.setupEventListeners();
         this.setupTheme();
         this.renderMenu();
-        this.loadDefaultContent();
+        this.handleInitialRoute();
     }
 
     async loadMenuData() {
@@ -80,6 +81,11 @@ class PoCGuide {
         const savedTheme = localStorage.getItem('theme') || 'dark';
         document.documentElement.setAttribute('data-theme', savedTheme);
         this.updateThemeButton(savedTheme);
+        
+        // 에디터 테마도 업데이트
+        if (window.editorManager) {
+            window.editorManager.updateTheme();
+        }
     }
 
     toggleTheme() {
@@ -89,6 +95,11 @@ class PoCGuide {
         document.documentElement.setAttribute('data-theme', newTheme);
         localStorage.setItem('theme', newTheme);
         this.updateThemeButton(newTheme);
+        
+        // 에디터 테마도 업데이트
+        if (window.editorManager) {
+            window.editorManager.updateTheme();
+        }
     }
 
     updateThemeButton(theme) {
@@ -223,6 +234,19 @@ class PoCGuide {
         toggle.classList.toggle('expanded');
     }
 
+    handleInitialRoute() {
+        // URL에서 페이지 파라미터 확인
+        const url = new URL(window.location);
+        const page = url.searchParams.get('page');
+        
+        if (page) {
+            this.loadContent(page);
+        } else {
+            // 기본 페이지 로드
+            this.loadDefaultContent();
+        }
+    }
+
     async loadDefaultContent() {
         if (this.menuData.menu.length > 0 && this.menuData.menu[0].items.length > 0) {
             const firstFile = this.menuData.menu[0].items[0].file;
@@ -237,6 +261,12 @@ class PoCGuide {
             this.updateActiveMenuItem(filename);
             this.closeSearch();
             
+            // 현재 파일 저장 (에디터용)
+            this.currentFile = filename;
+            if (window.editorManager) {
+                window.editorManager.currentFile = filename;
+            }
+            
             // URL 업데이트 (히스토리 API 사용)
             const url = new URL(window.location);
             url.searchParams.set('page', filename);
@@ -249,6 +279,12 @@ class PoCGuide {
     }
 
     async loadMarkdownContent(filename) {
+        // 먼저 로컬 스토리지에서 임시 저장된 내용 확인
+        const tempContent = localStorage.getItem(`temp_${filename}`);
+        if (tempContent) {
+            return tempContent;
+        }
+        
         const response = await fetch(`content/guides/${filename}`);
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -309,11 +345,25 @@ class PoCGuide {
         const toast = document.createElement('div');
         toast.className = 'toast';
         toast.textContent = message;
+        toast.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            border-radius: 4px;
+            z-index: 1001;
+            animation: slideIn 0.3s ease;
+        `;
         
         document.body.appendChild(toast);
         
         setTimeout(() => {
-            toast.remove();
+            toast.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => {
+                document.body.removeChild(toast);
+            }, 300);
         }, 3000);
     }
 
